@@ -28,6 +28,11 @@ namespace MvuSharp
             return await ((RequestHandlerWrapper<TResponse>) definition).RunAsync(request, _factory, cancellationToken);
         }
 
+        public async Task SendAsync(IRequest request, CancellationToken cancellationToken)
+        {
+            await SendAsync<Unit>(request, cancellationToken);
+        }
+
         private abstract class RequestHandlerWrapper<TResponse>
         {
             public abstract Task<TResponse> RunAsync(IRequest<TResponse> request, ServiceFactory factory,
