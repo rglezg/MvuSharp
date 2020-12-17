@@ -30,7 +30,9 @@ namespace MvuSharp.Extensions.Microsoft.DependencyInjection
         {
             var concretions = new List<Type>();
             var interfaces = new List<Type>();
-            foreach (var type in assembliesToScan.SelectMany(a => a.DefinedTypes).Where(t => !t.IsOpenGeneric()))
+            foreach (var type in assembliesToScan
+                .SelectMany(a => a.DefinedTypes)
+                .Where(t => !t.IsOpenGeneric()))
             {
                 var interfaceTypes = type.FindInterfacesThatClose(openRequestInterface).ToArray();
                 if (!interfaceTypes.Any()) continue;

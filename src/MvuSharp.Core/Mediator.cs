@@ -22,21 +22,10 @@ namespace MvuSharp
             var requestType = request.GetType();
             var definition = Handlers.GetOrAdd(
                 requestType,
-                (type, cmdType) =>
-                    Activator.CreateInstance(typeof(RequestHandlerImpl<,>).MakeGenericType(cmdType, typeof(TResponse))),
+                (type, requestTypeArg) =>
+                    Activator.CreateInstance(typeof(RequestHandlerImpl<,>).MakeGenericType(requestTypeArg, typeof(TResponse))),
                 requestType);
             return await ((RequestHandlerWrapper<TResponse>) definition).RunAsync(request, _factory, cancellationToken);
-        }
-
-        public async Task SendAsync(IRequest request, CancellationToken cancellationToken)
-        {
-            var requestType = request.GetType();
-            var definition = Handlers.GetOrAdd(
-                requestType,
-                (type, cmdType) =>
-                    Activator.CreateInstance(typeof(RequestHandlerImpl<>).MakeGenericType(cmdType)),
-                requestType);
-            await ((RequestHandlerWrapper<Unit>) definition).RunAsync(request, _factory, cancellationToken);
         }
 
         private abstract class RequestHandlerWrapper<TResponse>
@@ -49,24 +38,15 @@ namespace MvuSharp
             : RequestHandlerWrapper<TResponse>
             where TRequest : IRequest<TResponse>
         {
-            public override Task<TResponse> RunAsync(IRequest<TResponse> request, ServiceFactory factory,
-                CancellationToken cancellationToken) =>
-                factory
-                    .GetService<IRequestHandler<TRequest, TResponse>>()
-                    .HandleAsync((TRequest) request, cancellationToken);
-        }
-
-        private class RequestHandlerImpl<TRequest>
-            : RequestHandlerWrapper<Unit>
-            where TRequest : IRequest
-        {
-            public override async Task<Unit> RunAsync(IRequest<Unit> request, ServiceFactory factory, 
+            public override async Task<TResponse> RunAsync(IRequest<TResponse> request, ServiceFactory factory,
                 CancellationToken cancellationToken)
             {
-                await factory
-                    .GetService<IRequestHandler<TRequest>>()
-                    .HandleAsync((TRequest) request, cancellationToken);
-                return Unit.Value;
+                var handler = factory.GetService<IRequestHandler<TRequest, TResponse>>();
+                if (handler is IAggregateHandler aggregateRequestHandler)
+                {
+                    aggregateRequestHandler.MediatorInternal = factory.GetService<IMediator>();
+                }
+                return await handler.HandleAsync((TRequest) request, cancellationToken);
             }
         }
     }

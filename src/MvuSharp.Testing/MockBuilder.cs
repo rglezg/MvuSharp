@@ -17,6 +17,15 @@ namespace MvuSharp.Testing
             return this;
         }
 
+        public MockBuilder Setup<TRequest>(Action<TRequest> handleAction)
+            where TRequest : IRequest
+        {
+            var handler = new MockRequestHandler<TRequest>(handleAction);
+            var handlerType = typeof(IRequestHandler<TRequest, Unit>);
+            _services[handlerType] = handler;
+            return this;
+        }
+
         public IMediator BuildMediator() => new Mediator(ServiceFactory);
     }
 }

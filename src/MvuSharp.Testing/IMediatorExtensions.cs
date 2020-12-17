@@ -6,7 +6,7 @@ namespace MvuSharp.Testing
 {
     public static class MediatorExtensions
     {
-        private static void TestMvuFunc<TModel, TMsg>(
+        public static void TestMvuFunc<TModel, TMsg>(
             this IMediator mediator,
             (TModel, CommandHandler<TMsg>) result,
             Action<TModel> assertModel = null,
@@ -28,6 +28,16 @@ namespace MvuSharp.Testing
             var msgList = new LinkedList<TMsg>();
             command(mediator, msg => msgList.AddLast(msg), default).Wait();
             assertMsg(msgList);
+        }
+
+        public static void TestAggregateRequest<THandler, TRequest, TResponse>(
+            this IMediator mediator,
+            TRequest request,
+            Action<TResponse> assertResponse)
+            where THandler : AggregateRequestHandler<TRequest, TResponse>
+        {
+            var handler = Activator.CreateInstance<THandler>();
+            assertResponse(handler.HandleAsync(request, default).Result);
         }
     }
 }
