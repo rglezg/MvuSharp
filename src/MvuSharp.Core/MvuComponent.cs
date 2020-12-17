@@ -16,4 +16,14 @@
             Update = update;
         }
     }
+
+    public delegate (TModel, CommandHandler<TMsg>) InitHandlerNoArgs<TModel, TMsg>();
+    public abstract class MvuComponent<TModel, TMsg>
+     :MvuComponent<TModel, TMsg, Unit>
+    {
+        protected MvuComponent(InitHandlerNoArgs<TModel, TMsg> init, UpdateHandler<TModel, TMsg> update) 
+            : base(_ => init(), update)
+        {
+        }
+    }
 }

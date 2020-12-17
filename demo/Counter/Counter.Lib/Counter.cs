@@ -16,7 +16,7 @@ namespace Counter.Lib
             public record Set(int Value) : Msg();
         }
     
-        public static (Model, CommandHandler<Msg>) Init(Unit unit) 
+        public static (Model, CommandHandler<Msg>) Init() 
         {
             return (new Model(0), null);
         }
@@ -41,7 +41,7 @@ namespace Counter.Lib
             }
         }
 
-        public class Component : MvuComponent<Model, Msg, Unit>
+        public class Component : MvuComponent<Model, Msg>
         {
             public Component() : base(Counter.Init, Counter.Update)
             {
