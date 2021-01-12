@@ -9,21 +9,22 @@ namespace MvuSharp
     {
         private readonly ServiceFactory _factory;
 
-        private static readonly ConcurrentDictionary<Type, dynamic> Handlers =
-            new ConcurrentDictionary<Type, dynamic>();
+        private static readonly ConcurrentDictionary<Type, dynamic> Handlers = new();
 
         public Mediator(ServiceFactory factory)
         {
             _factory = factory;
         }
 
-        public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken)
+        public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request,
+            CancellationToken cancellationToken)
         {
             var requestType = request.GetType();
             var definition = Handlers.GetOrAdd(
                 requestType,
-                (type, requestTypeArg) =>
-                    Activator.CreateInstance(typeof(RequestHandlerImpl<,>).MakeGenericType(requestTypeArg, typeof(TResponse))),
+                (_, requestTypeArg) =>
+                    Activator.CreateInstance(
+                        typeof(RequestHandlerImpl<,>).MakeGenericType(requestTypeArg, typeof(TResponse))),
                 requestType);
             return await ((RequestHandlerWrapper<TResponse>) definition).RunAsync(request, _factory, cancellationToken);
         }

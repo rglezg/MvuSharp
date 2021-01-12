@@ -11,7 +11,7 @@ namespace MvuSharp
 	public static class Command
 	{
 		public static CommandHandler<TMsg> OfMsg<TMsg>(TMsg msg) =>
-			(mediator, dispatch, token) => 
+			(_, dispatch, _) => 
 			{
 				dispatch(msg);
 				return Task.CompletedTask;
@@ -30,7 +30,7 @@ namespace MvuSharp
 			IRequest<TResult> request,
 			Action<TResult> onSuccess,
 			Action<Exception> onFailure) =>
-			async (mediator, dispatch, token) =>
+			async (mediator, _, token) =>
 			{
 				try
 				{

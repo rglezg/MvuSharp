@@ -5,7 +5,7 @@ namespace MvuSharp.Testing
 {
     public class MockBuilder
     {
-        private readonly Dictionary<Type, dynamic> _services = new Dictionary<Type, dynamic>();
+        private readonly Dictionary<Type, dynamic> _services = new();
         private ServiceFactory ServiceFactory => (type) => _services[type];
 
         public MockBuilder Setup<TRequest, TResponse>(Func<TRequest, TResponse> handleFunc)

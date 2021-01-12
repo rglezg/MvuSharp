@@ -4,7 +4,7 @@ namespace MvuSharp
 {
     public struct Unit : IEquatable<Unit>, IComparable<Unit>, IComparable
     {
-        public static readonly Unit Value = new Unit();
+        public static readonly Unit Value = new();
         
         public static readonly System.Threading.Tasks.Task<Unit> Task = 
             System.Threading.Tasks.Task.FromResult(Value);

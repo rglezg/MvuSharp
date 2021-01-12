@@ -10,10 +10,10 @@ namespace Counter.Lib
         public record Msg
         {
             private Msg() {}
-            public record Increment() : Msg();
-            public record Decrement() : Msg();
-            public record Random() : Msg();
-            public record Set(int Value) : Msg();
+            public record Increment : Msg;
+            public record Decrement : Msg;
+            public record Random : Msg;
+            public record Set(int Value) : Msg;
         }
     
         public static (Model, CommandHandler<Msg>) Init() 
@@ -27,7 +27,7 @@ namespace Counter.Lib
             {
                 case Msg.Increment _:
                     return (model with {Count = model.Count + 1}, null);
-                case Msg.Decrement _ :
+                case Msg.Decrement _:
                     return (model with {Count = model.Count - 1}, null);
                 case Msg.Random _:
                     return (model, 
