@@ -30,6 +30,10 @@ namespace MvuSharp
                 await cmd(_mediator, msgQueue.Enqueue, default);
                 await MsgLoopAsync(msgQueue, default);
             }
+            else if (ViewEngine != null)
+            {
+                await ViewEngine.RenderViewAsync(model);
+            }
         }
 
         public async Task DispatchAsync(TMsg msg, CancellationToken cancellationToken = default)
@@ -49,7 +53,7 @@ namespace MvuSharp
         private async Task MsgLoopAsync(Queue<TMsg> msgQueue, CancellationToken cancellationToken)
         {
             DispatchHandler<TMsg> dispatchHandler = msgQueue.Enqueue;
-            while (!(msgQueue.Count == 0 && cancellationToken.IsCancellationRequested))
+            while (msgQueue.Count != 0 && !cancellationToken.IsCancellationRequested)
             {
                 var (model, cmd) = Component.Update(_model, msgQueue.Dequeue());
                 _model = model;

@@ -11,13 +11,7 @@ namespace MvuSharp.Blazor
     where TComponent : MvuComponent<TModel, TMsg, TArg>, new()
     where TModel : class
     {
-        private readonly Action _stateHasChanged;
         public TModel Model { get; private set; }
-
-        public MvuPage()
-        {
-            _stateHasChanged = StateHasChanged;
-        }
 
         public void Dispatch(TMsg msg)
         {
@@ -33,7 +27,7 @@ namespace MvuSharp.Blazor
         public async Task RenderViewAsync(TModel model)
         {
             Model = model;
-            await InvokeAsync(_stateHasChanged);
+            await InvokeAsync(StateHasChanged);
         }
         
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -50,10 +44,5 @@ namespace MvuSharp.Blazor
         }
 
         protected override bool ShouldRender() => Service.ModelHasChanged();
-
-        public void Dispose()
-        {
-            Service.ViewEngine = null;
-        }
     }
 }
