@@ -11,9 +11,9 @@ namespace MvuSharp
 
         private static readonly ConcurrentDictionary<Type, dynamic> Handlers = new();
 
-        public Mediator(ServiceFactory factory)
+        public Mediator(ServiceFactory serviceFactory)
         {
-            _factory = factory;
+            _factory = serviceFactory;
         }
 
         public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request,

@@ -5,22 +5,28 @@ using Microsoft.AspNetCore.Components;
 
 namespace MvuSharp.Blazor
 {
-    public abstract class MvuPage<TComponent, TModel, TMsg, TArg> 
-    : OwningComponentBase<MvuCore<TComponent, TModel, TMsg, TArg>>, 
+    public abstract class MvuPage<TComponent, TModel, TMsg, TArg> : 
+        ComponentBase,
         IMvuViewEngine<TModel, TMsg, TArg>
     where TComponent : MvuComponent<TModel, TMsg, TArg>, new()
     where TModel : class
     {
-        public TModel Model { get; private set; }
+        private MvuProgram<TComponent, TModel, TMsg, TArg> _mvuProgram;
+        protected TModel Model { get; private set; }
+        
+        [Inject]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public IServiceProvider ServiceProvider { get; set; }
 
-        public void Dispatch(TMsg msg)
+        /// <summary>
+        /// Puts a message in the message queue and starts the MVU loop.
+        /// </summary>
+        /// <param name="msg">The message to start the loop.</param>
+        /// <param name="cancellationToken">A token for cancelling the task.</param>
+        /// <returns></returns>
+        public async Task Dispatch(TMsg msg, CancellationToken cancellationToken = default)
         {
-            Service.DispatchAsync(msg);
-        }
-
-        public async Task DispatchAsync(TMsg msg, CancellationToken cancellationToken = default)
-        {
-            await Service.DispatchAsync(msg, cancellationToken);
+            await _mvuProgram.DispatchAsync(msg, cancellationToken);
         }
         
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -29,20 +35,29 @@ namespace MvuSharp.Blazor
             Model = model;
             await InvokeAsync(StateHasChanged);
         }
-        
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public virtual TArg GetInitArgs() => default;
 
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public abstract TArg GetInitArgs();
+
+        /// <inheritdoc/>
+        /// <remarks>In MVU#, this method is responsible of initializing the MVU core loop.</remarks>
         protected override void OnInitialized()
         {
-            Service.ViewEngine = this;
+            _mvuProgram = new MvuProgram<TComponent, TModel, TMsg, TArg>(ServiceProvider, this);
         }
 
         protected override async Task OnParametersSetAsync()
         {
-            await Service.InitAsync();
+            await _mvuProgram.InitAsync();
         }
 
-        protected override bool ShouldRender() => Service.ModelHasChanged();
+        protected override bool ShouldRender() => _mvuProgram.ModelHasChanged();
+    }
+
+    public class MvuPage<TComponent, TModel, TMsg> : MvuPage<TComponent, TModel, TMsg, Unit>
+        where TComponent : MvuComponent<TModel, TMsg, Unit>, new()
+        where TModel : class
+    {
+        public override Unit GetInitArgs() => Unit.Value;
     }
 }

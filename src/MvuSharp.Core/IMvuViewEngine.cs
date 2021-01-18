@@ -8,7 +8,6 @@ namespace MvuSharp
     {
         Task RenderViewAsync(TModel model);
         TArgs GetInitArgs();
-        void Dispatch(TMsg msg);
-        Task DispatchAsync(TMsg msg, CancellationToken cancellationToken);
+        Task Dispatch(TMsg msg, CancellationToken cancellationToken);
     }
 }

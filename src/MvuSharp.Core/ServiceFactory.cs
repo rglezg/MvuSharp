@@ -3,7 +3,7 @@
 namespace MvuSharp
 {
     public delegate object ServiceFactory(Type type);
-
+    public delegate ServiceFactory ServiceProviderFactory();
     internal static class ServiceFactoryExtensions
     {
         public static T GetService<T>(this ServiceFactory factory)
