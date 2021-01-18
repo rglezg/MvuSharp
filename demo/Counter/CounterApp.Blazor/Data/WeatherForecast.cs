@@ -1,6 +1,6 @@
 using System;
 
-namespace Counter.Blazor.Data
+namespace CounterApp.Blazor.Data
 {
     public class WeatherForecast
     {

@@ -1,0 +1,17 @@
+﻿@page "/counter"
+@using static Core.Counter
+@inherits MvuSharp.Blazor.MvuPage<Component, Model, Msg>
+
+<h1>Counter</h1>
+@if (Model.Working)
+{
+    <p>Working...</p>
+}
+else
+{
+    <p>Current count: @Model.Count</p>
+}
+
+<button class="btn btn-primary" disabled="@Model.Working" @onclick="@(() => Dispatch(new Msg.Increment()))">Increment</button>
+<button class="btn btn-primary" disabled="@Model.Working" @onclick="@(() => Dispatch(new Msg.Decrement()))">Decrement</button>
+<button class="btn btn-primary" disabled="@Model.Working" @onclick="@(() => Dispatch(new Msg.Random()))">Random</button>

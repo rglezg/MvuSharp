@@ -5,7 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Counter.Lib\Counter.Lib.csproj" />
+      <ProjectReference Include="..\..\..\src\MvuSharp.Blazor\MvuSharp.Blazor.csproj" />
+      <ProjectReference Include="..\CounterApp.Core\CounterApp.Core.csproj" />
     </ItemGroup>
 
 </Project>

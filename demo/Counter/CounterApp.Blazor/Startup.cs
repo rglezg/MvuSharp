@@ -9,9 +9,13 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Counter.Blazor.Data;
+using CounterApp.Core;
+using CounterApp.Blazor.Data;
+using CounterApp.Blazor.Handlers;
+using CounterApp.Blazor.Services;
+using MvuSharp;
 
-namespace Counter.Blazor
+namespace CounterApp.Blazor
 {
     public class Startup
     {
@@ -29,6 +33,12 @@ namespace Counter.Blazor
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
+            //MVU# Setup
+            services.AddScoped(typeof(MvuProgram<,,,>));
+            //Services
+            services.AddSingleton(new RandomGenerator());
+            //Handlers
+            services.AddScoped<IRequestHandler<Request.RandomInt, int>, RandomIntHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
