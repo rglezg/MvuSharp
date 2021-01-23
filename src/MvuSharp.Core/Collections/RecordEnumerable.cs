@@ -6,10 +6,10 @@ using System.Linq;
 namespace MvuSharp.Collections
 {
     public class RecordEnumerable<TSeq, T> : IEnumerable<T>, IEquatable<RecordEnumerable<TSeq, T>>
-    where TSeq : IEnumerable<T>
+        where TSeq : IEnumerable<T>
     {
         private readonly Lazy<int> _hashCode;
-        
+
         public TSeq Collection { get; }
 
         internal RecordEnumerable(TSeq seq)
@@ -22,6 +22,7 @@ namespace MvuSharp.Collections
                 {
                     hash.Add(item.GetHashCode());
                 }
+
                 return hash.ToHashCode();
             });
         }
@@ -30,13 +31,13 @@ namespace MvuSharp.Collections
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        protected virtual bool CollectionEquals(RecordEnumerable<TSeq, T> other) => 
+        protected virtual bool CollectionEquals(RecordEnumerable<TSeq, T> other) =>
             Collection.SequenceEqual(other.Collection);
 
-        public bool Equals(RecordEnumerable<TSeq, T> other) => 
-            !ReferenceEquals(null, other) 
-            && (ReferenceEquals(this, other) 
-                || Collection.Count() == other.Collection.Count() 
+        public bool Equals(RecordEnumerable<TSeq, T> other) =>
+            !ReferenceEquals(null, other)
+            && (ReferenceEquals(this, other)
+                || Collection.Count() == other.Collection.Count()
                 && CollectionEquals(other));
 
         public override bool Equals(object obj) =>

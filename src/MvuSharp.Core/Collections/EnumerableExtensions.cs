@@ -13,7 +13,7 @@ namespace MvuSharp.Collections
 
         public static RecordArray<T> ToRecordArray<T>(this IEnumerable<T> source) =>
             new(source.ToImmutableArray());
-        
+
         public static RecordList<T> ToRecordList<T>(this IEnumerable<T> source) =>
             new(source.ToImmutableList());
 
@@ -25,20 +25,20 @@ namespace MvuSharp.Collections
 
         public static RecordSortedDictionary<TKey, TValue> ToRecordSortedDictionary<TKey, TValue>(
             this IEnumerable<KeyValuePair<TKey, TValue>> source) =>
-            new (source.ToImmutableSortedDictionary());
-        
+            new(source.ToImmutableSortedDictionary());
+
         public static RecordSortedDictionary<TKey, TValue> ToRecordSortedDictionary<T, TKey, TValue>(
             this IEnumerable<T> source, Func<T, TKey> selectKey, Func<T, TValue> selectValue) =>
-            new (source.Select(e => 
+            new(source.Select(e =>
                 new KeyValuePair<TKey, TValue>(selectKey(e), selectValue(e))).ToImmutableSortedDictionary());
-        
+
         public static RecordDictionary<TKey, TValue> ToRecordDictionary<TKey, TValue>(
             this IEnumerable<KeyValuePair<TKey, TValue>> source) =>
             new(source.ToImmutableDictionary());
-        
+
         public static RecordDictionary<TKey, TValue> ToRecordDictionary<T, TKey, TValue>(
             this IEnumerable<T> source, Func<T, TKey> selectKey, Func<T, TValue> selectValue) =>
-            new (source.Select(e => 
+            new(source.Select(e =>
                 new KeyValuePair<TKey, TValue>(selectKey(e), selectValue(e))).ToImmutableDictionary());
     }
 }
