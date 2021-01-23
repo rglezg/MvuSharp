@@ -7,10 +7,6 @@ namespace MvuSharp.Collections
 {
     public static class EnumerableExtensions
     {
-        public static RecordEnumerable<TSeq, T> ToRecordSeq<TSeq, T>(this TSeq seq)
-            where TSeq : IEnumerable<T> =>
-            new(seq);
-
         public static RecordArray<T> ToRecordArray<T>(this IEnumerable<T> source) =>
             new(source.ToImmutableArray());
 
