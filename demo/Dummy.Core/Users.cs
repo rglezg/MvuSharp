@@ -12,12 +12,15 @@ namespace Dummy.Core
 
         public record Msg
         {
-            private Msg(){}
+            private Msg()
+            {
+            }
 
             public record Add(User UserToAdd) : Msg;
-            public record Delete(int Id) : Msg;
-            public record ShowAddView() : Msg;
 
+            public record Delete(int Id) : Msg;
+
+            public record ShowAddView() : Msg;
         }
 
         public static (Model, CommandHandler<Msg>) Init()
@@ -27,28 +30,21 @@ namespace Dummy.Core
 
         public static (Model, CommandHandler<Msg>) Update(Model model, Msg msg)
         {
-            var list = model.Users.Collection.ToList();
+            var list = model.Users.Collection;
             switch (msg)
             {
                 case Msg.Add user:
-                    list.Add(user.UserToAdd);
-                    return (model with
-                    {
-                        Users = list.ToRecordList(), Adding = false
-                    }, null);
+                    return (model with {Users = list.Add(user.UserToAdd), Adding = false}, null);
                 case Msg.Delete id:
                     var u = list.Find(user => user.Id == id.Id);
-                    list.Remove(u);
-                    return (model with
-                    {
-                        Users = list.ToRecordList()
-                    }, null);
+                    return (model with {Users = list.Remove(u)}, null);
                 case Msg.ShowAddView _:
                     return (model with {Adding = true}, null);
                 default:
                     throw new InvalidOperationException(msg.GetType().FullName);
             }
         }
+
         public class Component : MvuComponent<Model, Msg>
         {
             public Component() : base(Users.Init, Users.Update)
