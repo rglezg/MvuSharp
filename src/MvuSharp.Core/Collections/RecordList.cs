@@ -15,7 +15,7 @@ namespace MvuSharp.Collections
             return record.Collection;
         }
 
-        public static explicit operator RecordList<T>(ImmutableList<T> list)
+        public static implicit operator RecordList<T>(ImmutableList<T> list)
         {
             return new(list);
         }

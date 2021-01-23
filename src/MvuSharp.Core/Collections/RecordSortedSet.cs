@@ -15,7 +15,7 @@ namespace MvuSharp.Collections
             return record.Collection;
         }
 
-        public static explicit operator RecordSortedSet<T>(ImmutableSortedSet<T> SortedSet)
+        public static implicit operator RecordSortedSet<T>(ImmutableSortedSet<T> SortedSet)
         {
             return new(SortedSet);
         }

@@ -21,7 +21,7 @@ namespace MvuSharp.Collections
             return record.Collection;
         }
 
-        public static explicit operator RecordHashSet<T>(ImmutableHashSet<T> hashSet)
+        public static implicit operator RecordHashSet<T>(ImmutableHashSet<T> hashSet)
         {
             return new(hashSet);
         }

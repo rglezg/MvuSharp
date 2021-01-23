@@ -21,7 +21,7 @@ namespace MvuSharp.Collections
             return record.Collection;
         }
 
-        public static explicit operator RecordQueue<T>(ImmutableQueue<T> queue)
+        public static implicit operator RecordQueue<T>(ImmutableQueue<T> queue)
         {
             return new(queue);
         }

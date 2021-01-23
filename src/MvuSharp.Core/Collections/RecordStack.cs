@@ -21,7 +21,7 @@ namespace MvuSharp.Collections
             return record.Collection;
         }
 
-        public static explicit operator RecordStack<T>(ImmutableStack<T> stack)
+        public static implicit operator RecordStack<T>(ImmutableStack<T> stack)
         {
             return new(stack);
         }

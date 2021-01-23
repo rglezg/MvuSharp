@@ -15,7 +15,7 @@ namespace MvuSharp.Collections
             return record.Collection;
         }
 
-        public static explicit operator RecordArray<T>(ImmutableArray<T> array)
+        public static implicit operator RecordArray<T>(ImmutableArray<T> array)
         {
             return new(array);
         }

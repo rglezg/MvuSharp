@@ -32,7 +32,7 @@ namespace MvuSharp.Collections
             return record.Collection;
         }
 
-        public static explicit operator RecordDictionary<TKey, TValue>(ImmutableDictionary<TKey, TValue> dictionary)
+        public static implicit operator RecordDictionary<TKey, TValue>(ImmutableDictionary<TKey, TValue> dictionary)
         {
             return new(dictionary);
         }

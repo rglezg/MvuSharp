@@ -20,7 +20,7 @@ namespace MvuSharp.Collections
             return record.Collection;
         }
 
-        public static explicit operator RecordSortedDictionary<TKey, TValue>(
+        public static implicit operator RecordSortedDictionary<TKey, TValue>(
             ImmutableSortedDictionary<TKey, TValue> dictionary)
         {
             return new(dictionary);
