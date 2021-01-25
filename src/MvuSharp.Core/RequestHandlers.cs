@@ -3,79 +3,44 @@ using System.Threading.Tasks;
 
 namespace MvuSharp
 {
-    public interface IRequest<TResponse> { }
-    
-    public interface IRequestHandler<in TRequest, TResponse>
+    public interface IRequest<TResponse>
     {
-        Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken);
     }
 
-    internal interface IAggregateHandler
+    public interface IRequest : IRequest<Unit>
     {
-        internal IMediator MediatorInternal { get; set; }
     }
-    
-    public abstract class RequestHandler<TRequest, TResponse>
-    : IRequestHandler<TRequest, TResponse>
-    {
-        public abstract Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken);
-    }
-    
-    public interface IRequest : IRequest<Unit> {}
 
-    public abstract class RequestHandler<TRequest>
-        : IRequestHandler<TRequest, Unit>
+    public abstract class RequestHandlerWrapper<TResponse>
     {
-        async Task<Unit> IRequestHandler<TRequest, Unit>.HandleAsync(TRequest request, CancellationToken cancellationToken)
+        public abstract Task<TResponse> RunAsync(IRequest<TResponse> request, ServiceFactory factory,
+            CancellationToken cancellationToken);
+    }
+
+    public delegate Task<TResponse> RequestHandler<in TRequest, TResponse, in TService>(
+        TRequest request,
+        TService service,
+        CancellationToken token)
+        where TRequest : IRequest<TResponse>
+        where TService : class;
+
+    public class RequestHandlerImplementation<TRequest, TResponse, TService>
+        : RequestHandlerWrapper<TResponse>
+        where TRequest : IRequest<TResponse>
+        where TService : class
+    {
+        private readonly RequestHandler<TRequest, TResponse, TService> _handler;
+
+        public RequestHandlerImplementation(RequestHandler<TRequest, TResponse, TService> handler)
         {
-            await HandleAsync(request, cancellationToken);
-            return Unit.Value;
+            _handler = handler;
         }
 
-        protected abstract Task HandleAsync(TRequest request, CancellationToken cancellationToken);
-    }
-
-    public abstract class SyncRequestHandler<TRequest, TResponse>
-        : IRequestHandler<TRequest, TResponse>
-    {
-        public Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken) => 
-            Task.FromResult(Handle(request));
-
-        protected abstract TResponse Handle(TRequest request);
-    }
-
-    public abstract class SyncRequestHandler<TRequest>
-        : IRequestHandler<TRequest, Unit>
-    {
-        public Task<Unit> HandleAsync(TRequest request, CancellationToken cancellationToken)
+        public override async Task<TResponse> RunAsync(IRequest<TResponse> request, ServiceFactory factory,
+            CancellationToken cancellationToken)
         {
-            Handle(request);
-            return Unit.Task;
+            var service = typeof(TService) == typeof(object) ? null : factory.GetService<TService>();
+            return await _handler((TRequest) request, service, cancellationToken);
         }
-
-        protected abstract void Handle(TRequest request);
-    }
-
-    public abstract class AggregateRequestHandler<TRequest, TResponse>
-        : IRequestHandler<TRequest, TResponse>, IAggregateHandler
-    {
-        IMediator IAggregateHandler.MediatorInternal { get; set; }
-        protected IMediator Mediator => (this as IAggregateHandler).MediatorInternal;
-    
-        public abstract Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken);
-    }
-
-    public abstract class AggregateRequestHandler<TRequest>
-        : IRequestHandler<TRequest, Unit>, IAggregateHandler
-    {
-        IMediator IAggregateHandler.MediatorInternal { get; set; }
-        protected IMediator Mediator => (this as IAggregateHandler).MediatorInternal;
-        async Task<Unit> IRequestHandler<TRequest, Unit>.HandleAsync(TRequest request, CancellationToken cancellationToken)
-        {
-            await HandleAsync(request, cancellationToken);
-            return Unit.Value;
-        }
-
-        protected abstract Task HandleAsync(TRequest request, CancellationToken cancellationToken);
     }
 }

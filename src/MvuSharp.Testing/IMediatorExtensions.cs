@@ -29,15 +29,5 @@ namespace MvuSharp.Testing
             command(mediator, msg => msgList.AddLast(msg), default).Wait();
             assertMsg(msgList);
         }
-
-        public static void TestAggregateRequest<THandler, TRequest, TResponse>(
-            this IMediator mediator,
-            TRequest request,
-            Action<TResponse> assertResponse)
-            where THandler : AggregateRequestHandler<TRequest, TResponse>
-        {
-            var handler = Activator.CreateInstance<THandler>();
-            assertResponse(handler.HandleAsync(request, default).Result);
-        }
     }
 }
