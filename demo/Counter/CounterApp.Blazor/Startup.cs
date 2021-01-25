@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -11,7 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using CounterApp.Core;
 using CounterApp.Blazor.Data;
-using CounterApp.Blazor.Handlers;
 using CounterApp.Blazor.Services;
 using MvuSharp;
 
@@ -38,7 +38,14 @@ namespace CounterApp.Blazor
             //Services
             services.AddSingleton(new RandomGenerator());
             //Handlers
-            services.AddScoped<IRequestHandler<Request.RandomInt, int>, RandomIntHandler>();
+            var handlers = new HandlerRegistrar();
+            handlers.Add(async (Request.RandomInt _, RandomGenerator generator, CancellationToken cancellationToken) =>
+            {
+                var random = generator.RandomInt(0, 100);
+                await Task.Delay(random * 20, cancellationToken);
+                return random;
+            });
+            services.AddSingleton(handlers);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
