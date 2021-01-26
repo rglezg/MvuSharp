@@ -44,7 +44,6 @@ namespace Dummy.Blazor
                     async (Request.AddUser request, AppDbContext context, CancellationToken cancellationToken) =>
                     {
                         await context.AddAsync(request.UserToAdd, cancellationToken);
-                        return Unit.Value;
                     })
                 .Add(
                     (Request.DeleteUser request, AppDbContext context) =>
