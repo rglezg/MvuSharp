@@ -13,16 +13,16 @@ namespace MvuSharp
         private readonly IServiceProvider _serviceProvider;
         private readonly IMvuViewEngine<TModel, TMsg, TArgs> _viewEngine;
         private static readonly MvuComponent<TModel, TMsg, TArgs> Component = new TComponent();
-        
+
         private volatile TModel _oldModel;
         private volatile TModel _model;
 
         public MvuProgram(
-            IServiceProvider serviceProvider, 
+            IServiceProvider serviceProvider,
             IMvuViewEngine<TModel, TMsg, TArgs> viewEngine)
         {
-            _serviceProvider = serviceProvider;
-            _viewEngine = viewEngine;
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
         }
 
         private IMediator CreateMediator()
@@ -33,23 +33,34 @@ namespace MvuSharp
 
         public async Task InitAsync()
         {
+            if (_model != null)
+            {
+                throw new InvalidOperationException("The component is already initialized.");
+            }
+
             var (model, cmd) = Component.Init(_viewEngine.GetInitArgs());
             _model = _oldModel = model;
-            if (cmd != null)
-            {
-                var mediator = CreateMediator();
-                var msgQueue = new Queue<TMsg>();
-                await cmd(mediator, msgQueue.Enqueue, default);
-                await MsgLoopAsync(msgQueue, default, mediator);
-            }
-            else if (_viewEngine != null)
+            if (cmd == null)
             {
                 await _viewEngine.RenderViewAsync(model);
+                return;
             }
+
+            var mediator = CreateMediator();
+            var msgQueue = new Queue<TMsg>();
+            await cmd(mediator, msgQueue.Enqueue, default);
+            await MsgLoopAsync(msgQueue, default, mediator);
         }
 
         public async Task DispatchAsync(TMsg msg, CancellationToken cancellationToken = default)
         {
+            if (_model == null)
+            {
+                throw new InvalidOperationException(
+                    $"The component has not been initialized. " +
+                    $"Call {nameof(InitAsync)} once before dispatching any message.");
+            }
+
             var msgQueue = new Queue<TMsg>();
             msgQueue.Enqueue(msg);
             await MsgLoopAsync(msgQueue, cancellationToken);
@@ -62,7 +73,8 @@ namespace MvuSharp
             return true;
         }
 
-        private async Task MsgLoopAsync(Queue<TMsg> msgQueue, CancellationToken cancellationToken, IMediator mediator = null)
+        private async Task MsgLoopAsync(Queue<TMsg> msgQueue, CancellationToken cancellationToken,
+            IMediator mediator = null)
         {
             DispatchHandler<TMsg> dispatchHandler = msgQueue.Enqueue;
             while (msgQueue.Count != 0 && !cancellationToken.IsCancellationRequested)
@@ -70,10 +82,7 @@ namespace MvuSharp
                 var (model, cmd) = Component.Update(_model, msgQueue.Dequeue());
                 _model = model;
 
-                if (_viewEngine != null)
-                {
-                    await _viewEngine.RenderViewAsync(model);
-                }
+                await _viewEngine.RenderViewAsync(model);
 
                 if (cmd == null) continue;
                 mediator ??= CreateMediator();
