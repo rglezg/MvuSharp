@@ -1,6 +1,8 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
+using Dummy.Core;
 using Dummy.Core.Models;
+using MvuSharp;
 using MvuSharp.Collections;
 using MvuSharp.Testing;
 using Xunit;
@@ -27,11 +29,14 @@ namespace Dummy.Tests
             var user = new User(4,"Tester", "tester@email.com", 26);
             RecordList<User> list = DefaultModel.Users.Collection.Add(user);
             var model = DefaultModel with {Adding = true};
-            new MockBuilder()
+            new HandlerRegistrar()
+                .Add<Request.AddUser, bool>(_ => true)
                 .BuildMediator()
                 .TestMvuFunc(Update(model, new Msg.Add(user)),
                     m => Assert.Equal(
-                        model with{Users = list, Adding = false}, m));
+                        model, m),
+                    msg => Assert.Equal(new Msg.Set(model with{Users = list, Adding = false}), 
+                        msg.Single()));
         }
 
         [Fact(DisplayName = "'Delete' removes a user by their Id.")]
@@ -39,13 +44,15 @@ namespace Dummy.Tests
         {
             const int id = 2;
             var model = DefaultModel;
-            new MockBuilder()
+            new HandlerRegistrar()
+                .Add<Request.DeleteUser, bool>(_ => true)
                 .BuildMediator()
                 .TestMvuFunc(Update(model, new Msg.Delete(id)),
-                    m => Assert.Equal(
-                        model with {
-                            Users = DefaultModel.Users.Collection.Where(u => u.Id != id).ToRecordList()}, 
-                        m));
+                    m => Assert.Equal(model, m),
+                    msg => Assert.Equal(
+                        new Msg.Set(model with {
+                            Users = DefaultModel.Users.Collection.Where(u => u.Id != id).ToRecordList()}),
+                        msg.Single()));
         }
     }
 }

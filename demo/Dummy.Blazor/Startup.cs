@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -10,6 +11,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Dummy.Blazor.Data;
+using Dummy.Core;
+using Dummy.Core.Models;
+using Microsoft.EntityFrameworkCore;
+using MvuSharp;
 
 namespace Dummy.Blazor
 {
@@ -28,7 +33,36 @@ namespace Dummy.Blazor
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
+            services.AddDbContextFactory<AppDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            //Handlers
+            var handlers = new HandlerRegistrar();
+            handlers.Add(
+                async (Request.AddUser request, AppDbContext context, CancellationToken cancellationToken) => 
+                {
+                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+                await context.AddAsync(request.UserToAdd, cancellationToken);
+                try
+                {
+                    await context.SaveChangesAsync(cancellationToken);
+                    return true;
+                }
+                catch (DbUpdateException)
+                {
+                    return false;
+                }
+                });
+            handlers.Add(
+                async (Request.DeleteUser request, AppDbContext context, CancellationToken cancellationToken) =>
+                {
+                    context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+                    var user = await context.Users.FindAsync(request.Id, cancellationToken);
+                    if (user == null) return false;
+                    context.Users.Remove(user);
+                    await context.SaveChangesAsync(cancellationToken);
+                    return true;
+                });
+            services.AddSingleton(handlers);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
