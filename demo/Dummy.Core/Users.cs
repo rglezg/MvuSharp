@@ -56,7 +56,7 @@ namespace Dummy.Core
                             await mediator.SendAsync(request, token);
                             if (await mediator.SendAsync(new Request.SaveChanges(), token))
                             {
-                                dispatch(new Msg.Set(model with {Users = list.Add(user)}));
+                                dispatch(new Msg.Set(model with {Users = list.Remove(user)}));
                             }
                         });
                 case Msg.ShowAddView _:
