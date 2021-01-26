@@ -29,14 +29,16 @@ namespace Dummy.Tests
             var user = new User(4,"Tester", "tester@email.com", 26);
             RecordList<User> list = DefaultModel.Users.Collection.Add(user);
             var model = DefaultModel with {Adding = true};
+            User added = null;
             new HandlerRegistrar()
-                .Add<Request.AddUser, bool>(_ => true)
+                .Add<Request.AddUser>(request => added = request.UserToAdd)
                 .BuildMediator()
                 .TestMvuFunc(Update(model, new Msg.Add(user)),
                     m => Assert.Equal(
                         model, m),
                     msg => Assert.Equal(new Msg.Set(model with{Users = list, Adding = false}), 
                         msg.Single()));
+            Assert.Equal(user, added);
         }
 
         [Fact(DisplayName = "'Delete' removes a user by their Id.")]
@@ -44,8 +46,9 @@ namespace Dummy.Tests
         {
             const int id = 2;
             var model = DefaultModel;
+            User deleted = null;
             new HandlerRegistrar()
-                .Add<Request.DeleteUser, bool>(_ => true)
+                .Add<Request.DeleteUser>(request => deleted = request.UserToRemove)
                 .BuildMediator()
                 .TestMvuFunc(Update(model, new Msg.Delete(id)),
                     m => Assert.Equal(model, m),
@@ -53,6 +56,7 @@ namespace Dummy.Tests
                         new Msg.Set(model with {
                             Users = DefaultModel.Users.Collection.Where(u => u.Id != id).ToRecordList()}),
                         msg.Single()));
+            Assert.Equal(id, deleted.Id);
         }
     }
 }
