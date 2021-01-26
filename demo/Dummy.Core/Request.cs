@@ -5,8 +5,9 @@ namespace Dummy.Core
 {
     public static class Request
     {
-        public record AddUser(User UserToAdd) : IRequest<bool>;
-
-        public record DeleteUser(int Id) : IRequest<bool>;
+        public record AddUser(User UserToAdd) : IRequest;
+        public record DeleteUser(User UserToRemove) : IRequest;
+        public record FindUser(int Id) : IRequest<User>;
+        public record SaveChanges : IRequest<bool>;
     }
 }

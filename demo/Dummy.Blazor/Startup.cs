@@ -39,29 +39,31 @@ namespace Dummy.Blazor
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
             //Handlers
             var handlers = new HandlerRegistrar();
-            handlers.Add(
-                async (Request.AddUser request, AppDbContext context, CancellationToken cancellationToken) => 
-                {
-                await context.AddAsync(request.UserToAdd, cancellationToken);
-                try
-                {
-                    await context.SaveChangesAsync(cancellationToken);
-                    return true;
-                }
-                catch (DbUpdateException)
-                {
-                    return false;
-                }
-                });
-            handlers.Add(
-                async (Request.DeleteUser request, AppDbContext context, CancellationToken cancellationToken) =>
-                {
-                    var user = await context.Users.FindAsync(request.Id, cancellationToken);
-                    if (user == null) return false;
-                    context.Users.Remove(user);
-                    await context.SaveChangesAsync(cancellationToken);
-                    return true;
-                });
+            handlers
+                .Add(
+                    async (Request.AddUser request, AppDbContext context, CancellationToken cancellationToken) =>
+                    {
+                        await context.AddAsync(request.UserToAdd, cancellationToken);
+                        return Unit.Value;
+                    })
+                .Add(
+                    (Request.DeleteUser request, AppDbContext context) =>
+                    {
+                        context.Users.Remove(request.UserToRemove);
+                    })
+                .Add(async (Request.SaveChanges _, AppDbContext context, CancellationToken cancellationToken) =>
+                    {
+                        try
+                        {
+                            await context.SaveChangesAsync(cancellationToken);
+                            return true;
+                        }
+                        catch (DbUpdateException)
+                        {
+                            return false;
+                        }
+                    }
+                );
             services.AddSingleton(handlers);
         }
 
