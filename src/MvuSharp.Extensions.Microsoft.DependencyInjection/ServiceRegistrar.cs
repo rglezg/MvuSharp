@@ -13,7 +13,7 @@ namespace MvuSharp.Extensions.Microsoft.DependencyInjection
         {
             assembliesToScan = (assembliesToScan as Assembly[] ?? assembliesToScan).Distinct().ToArray();
 
-            ConnectImplementationsToTypesClosing(typeof(IRequestHandler<,>), services, assembliesToScan);
+            //ConnectImplementationsToTypesClosing(typeof(IRequestHandler<,>), services, assembliesToScan);
         }
 
         /// <summary>
