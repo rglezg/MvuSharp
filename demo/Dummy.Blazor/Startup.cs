@@ -35,7 +35,7 @@ namespace Dummy.Blazor
             services.AddServerSideBlazor();
             services.AddDbContextFactory<AppDbContext>(options =>
                 options
-                    .UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+                    .UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
             //Handlers
             var handlers = new HandlerRegistrar();
