@@ -34,13 +34,14 @@ namespace Dummy.Blazor
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddDbContextFactory<AppDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
             //Handlers
             var handlers = new HandlerRegistrar();
             handlers.Add(
                 async (Request.AddUser request, AppDbContext context, CancellationToken cancellationToken) => 
                 {
-                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
                 await context.AddAsync(request.UserToAdd, cancellationToken);
                 try
                 {
@@ -55,7 +56,6 @@ namespace Dummy.Blazor
             handlers.Add(
                 async (Request.DeleteUser request, AppDbContext context, CancellationToken cancellationToken) =>
                 {
-                    context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
                     var user = await context.Users.FindAsync(request.Id, cancellationToken);
                     if (user == null) return false;
                     context.Users.Remove(user);
