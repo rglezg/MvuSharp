@@ -21,6 +21,7 @@ namespace Dummy.Core
             public record Delete(int Id) : Msg;
 
             public record ShowAddView() : Msg;
+            public record Set(Model NewModel) : Msg;
         }
 
         public static (Model, CommandHandler<Msg>) Init()
@@ -34,12 +35,27 @@ namespace Dummy.Core
             switch (msg)
             {
                 case Msg.Add user:
-                    return (model with {Users = list.Add(user.UserToAdd), Adding = false}, null);
+                    return (model,
+                        Command.MapResult(
+                            new Request.AddUser(user.UserToAdd),
+                            response => response
+                                ? new Msg.Set(model with
+                                {
+                                    Users = list.Add(user.UserToAdd), Adding = false
+                                })
+                                : new Msg.Set(model)));
                 case Msg.Delete id:
                     var u = list.Find(user => user.Id == id.Id);
-                    return (model with {Users = list.Remove(u)}, null);
+                    return (model,
+                        Command.MapResult(
+                            new Request.DeleteUser(id.Id),
+                            response => response
+                                ? new Msg.Set(model with {Users = list.Remove(u)})
+                                : new Msg.Set(model)));
                 case Msg.ShowAddView _:
                     return (model with {Adding = true}, null);
+                case Msg.Set newModel:
+                    return (newModel.NewModel, null);
                 default:
                     throw new InvalidOperationException(msg.GetType().FullName);
             }
