@@ -34,24 +34,31 @@ namespace Dummy.Core
             var list = model.Users.Collection;
             switch (msg)
             {
-                case Msg.Add user:
+                case Msg.Add addMsg:
                     return (model,
-                        Command.MapResult(
-                            new Request.AddUser(user.UserToAdd),
-                            response => response
-                                ? new Msg.Set(model with
-                                {
-                                    Users = list.Add(user.UserToAdd), Adding = false
-                                })
-                                : new Msg.Set(model)));
+                        async (mediator, dispatch, token) =>
+                        {
+                            await mediator.SendAsync(new Request.AddUser(addMsg.UserToAdd), token);
+                            if (await mediator.SendAsync(new Request.SaveChanges(), token))
+                            {
+                                dispatch(new Msg.Set(model with {
+                                    Users = list.Add(addMsg.UserToAdd),
+                                    Adding = false
+                                }));
+                            }
+                        });
                 case Msg.Delete id:
-                    var u = list.Find(user => user.Id == id.Id);
+                    var user = list.Find(u => u.Id == id.Id);
+                    var request = new Request.DeleteUser(user);
                     return (model,
-                        Command.MapResult(
-                            new Request.DeleteUser(id.Id),
-                            response => response
-                                ? new Msg.Set(model with {Users = list.Remove(u)})
-                                : new Msg.Set(model)));
+                        async (mediator, dispatch, token) =>
+                        {
+                            await mediator.SendAsync(request, token);
+                            if (await mediator.SendAsync(new Request.SaveChanges(), token))
+                            {
+                                dispatch(new Msg.Set(model with {Users = list.Add(user)}));
+                            }
+                        });
                 case Msg.ShowAddView _:
                     return (model with {Adding = true}, null);
                 case Msg.Set newModel:
