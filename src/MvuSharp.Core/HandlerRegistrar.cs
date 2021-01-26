@@ -21,13 +21,13 @@ namespace MvuSharp
         }
 
         public HandlerRegistrar Add<TRequest, TService>(
-            Func<TRequest, TService, Task> handler)
+            Func<TRequest, TService, CancellationToken, Task> handler)
             where TRequest : IRequest
             where TService : class
         {
-            return Add<TRequest, Unit, TService>(async (request, service, _) =>
+            return Add<TRequest, Unit, TService>(async (request, service, token) =>
             {
-                await handler(request, service);
+                await handler(request, service, token);
                 return Unit.Value;
             });
         }
