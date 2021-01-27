@@ -38,6 +38,7 @@ namespace Dummy.Blazor
                     .UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
             //Handlers
+            services.AddScoped<AppDbContext>(p => p.GetService<AppDbContext>());
             var handlers = new HandlerRegistrar();
             handlers
                 .Add(
