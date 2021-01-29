@@ -50,6 +50,9 @@ namespace Dummy.Blazor
                     {
                         context.Users.Remove(request.UserToRemove);
                     })
+                .Add(
+                    async (Request.GetAllUsers _, AppDbContext context, CancellationToken cancellationToken) => 
+                        (await context.Users.ToListAsync(cancellationToken)).AsEnumerable())
                 .Add(async (Request.SaveChanges _, AppDbContext context, CancellationToken cancellationToken) =>
                     {
                         try
