@@ -13,12 +13,6 @@
             <ValidationSummary/>
             <p>
                 <label>
-                    Identifier:
-                    <InputNumber @bind-Value="_user.Id"/>
-                </label>
-            </p>
-            <p>
-                <label>
                     Name:
                     <InputText @bind-Value="_user.Name"/>
                 </label>
@@ -60,17 +54,17 @@ else
         </tr>
         </thead>
         <tbody>
-        @foreach (var user in @Model.Users.Collection)
+        @foreach (var (id, name, email, age) in Model.Users.Collection)
         {
             <tr>
-                <td>@user.Id</td>
-                <td>@user.Name</td>
-                <td>@user.Email</td>
-                <td>@user.Age</td>
+                <td>@id</td>
+                <td>@name</td>
+                <td>@email</td>
+                <td>@age</td>
                 <td>
                     <button
                         class="btn btn-danger"
-                        @onclick="@(async () => await Dispatch(new Msg.Delete(user.Id)))">
+                        @onclick="@(async () => await Dispatch(new Msg.Delete(id)))">
                         Delete
                     </button>
                 </td>
@@ -81,6 +75,6 @@ else
 </div>
 @code{
 
-    private User _user = new User();
+    private readonly User _user = new User();
 
 }
