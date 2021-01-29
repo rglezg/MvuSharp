@@ -26,7 +26,16 @@ namespace Dummy.Core
 
         public static (Model, CommandHandler<Msg>) Init()
         {
-            return (new Model(RecordList<User>.Empty, false), null);
+            var initModel = new Model(RecordList<User>.Empty, false);
+            return (initModel,
+                async (mediator, dispatch, token) =>
+                {
+                    var list = (await mediator.SendAsync(new Request.GetAllUsers(), token)).ToRecordList();
+                    if (list.Count != 0)
+                    {
+                        dispatch(new Msg.Set(initModel with {Users = list}));
+                    }
+                });
         }
 
         public static (Model, CommandHandler<Msg>) Update(Model model, Msg msg)
