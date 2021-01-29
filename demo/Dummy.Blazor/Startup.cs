@@ -33,12 +33,11 @@ namespace Dummy.Blazor
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddDbContextFactory<AppDbContext>(options =>
+            services.AddDbContext<AppDbContext>(options =>
                 options
                     .UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
             //Handlers
-            services.AddScoped<AppDbContext>(p => p.GetService<AppDbContext>());
             var handlers = new HandlerRegistrar();
             handlers
                 .Add(
