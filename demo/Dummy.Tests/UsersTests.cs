@@ -31,8 +31,8 @@ namespace Dummy.Tests
             RecordList<User> list = DefaultModel.Users.Collection.Add(user);
             var model = DefaultModel with {Adding = true};
             new HandlerRegistrar()
-                .Add<Request.AddUser, Unit>(_ => Unit.Value)
-                .Add<Request.SaveChanges, bool>(_ => true)
+                .Add(Handler.Create<Request.Add<User>>(_ => { }))
+                .Add(Handler.Create<Request.SaveChanges, bool>(_ => true))
                 .BuildMediator()
                 .TestMvuFunc(Update(model, new Msg.Add(user)),
                     m => Assert.Equal(
@@ -47,8 +47,8 @@ namespace Dummy.Tests
             const int id = 2;
             var model = DefaultModel;
             new HandlerRegistrar()
-                .Add<Request.DeleteUser>(_ => {})
-                .Add<Request.SaveChanges, bool>(_ => true)
+                .Add(Handler.Create<Request.Add<User>>(_ => { }))
+                .Add(Handler.Create<Request.SaveChanges, bool>(_ => true))
                 .BuildMediator()
                 .TestMvuFunc(Update(model, new Msg.Delete(id)),
                     m => Assert.Equal(model, m),

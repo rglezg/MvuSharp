@@ -40,19 +40,7 @@ namespace Dummy.Blazor
             //Handlers
             var handlers = new HandlerRegistrar();
             handlers
-                .Add(
-                    async (Request.AddUser request, AppDbContext context, CancellationToken cancellationToken) =>
-                    {
-                        await context.AddAsync(request.UserToAdd, cancellationToken);
-                    })
-                .Add(
-                    (Request.DeleteUser request, AppDbContext context) =>
-                    {
-                        context.Users.Remove(request.UserToRemove);
-                    })
-                .Add(
-                    async (Request.GetAllUsers _, AppDbContext context, CancellationToken cancellationToken) => 
-                        (await context.Users.ToListAsync(cancellationToken)).AsEnumerable())
+                .AddEntityHandlers()
                 .Add(async (Request.SaveChanges _, AppDbContext context, CancellationToken cancellationToken) =>
                     {
                         try
