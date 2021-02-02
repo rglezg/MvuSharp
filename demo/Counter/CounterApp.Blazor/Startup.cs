@@ -33,19 +33,17 @@ namespace CounterApp.Blazor
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
-            //MVU# Setup
-            services.AddScoped(typeof(MvuProgram<,,,>));
             //Services
             services.AddSingleton(new RandomGenerator());
             //Handlers
-            var handlers = new HandlerRegistrar();
-            handlers.Add(async (Request.RandomInt _, RandomGenerator generator, CancellationToken cancellationToken) =>
-            {
-                var random = generator.RandomInt(0, 100);
-                await Task.Delay(random * 20, cancellationToken);
-                return random;
-            });
-            services.AddSingleton(handlers);
+            services
+                .AddSingleton(new HandlerRegistrar()
+                .Add(async (Request.RandomInt _, RandomGenerator generator, CancellationToken cancellationToken) =>
+                {
+                    var random = generator.RandomInt(0, 100);
+                    await Task.Delay(random * 20, cancellationToken);
+                    return random;
+                }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

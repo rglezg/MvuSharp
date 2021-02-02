@@ -16,7 +16,8 @@ namespace CounterApp.Tests
         public void Increment()
         {
             var model = DefaultModel;
-            Mock.DefaultMediator
+            new HandlerRegistrar()
+                .BuildMediator()
                 .TestMvuFunc(Update(model, new Msg.Increment()),
                     m => Assert.Equal(model with {Count = 1}, m));
         }
@@ -25,7 +26,8 @@ namespace CounterApp.Tests
         public void Decrement()
         {
             var model = DefaultModel;
-            Mock.DefaultMediator
+            new HandlerRegistrar()
+                .BuildMediator()
                 .TestMvuFunc(Update(model, new Msg.Decrement()),
                     m => Assert.Equal(model with {Count = -1}, m));
         }
@@ -36,7 +38,7 @@ namespace CounterApp.Tests
             const int random = 5;
             var model = DefaultModel;
             new HandlerRegistrar()
-                .Add<Request.RandomInt, int>(_ => random)
+                .Add(Handler.Create<Request.RandomInt, int>(_ => random))
                 .BuildMediator()
                 .TestMvuFunc(Update(model, new Msg.Random()),
                     m => Assert.Equal(model with {Working = true}, m),
@@ -48,7 +50,8 @@ namespace CounterApp.Tests
         {
             const int random = 5;
             var model = DefaultModel with {Working = true};
-            Mock.DefaultMediator
+            new HandlerRegistrar()
+                .BuildMediator()
                 .TestMvuFunc(Update(model, new Msg.Set(random)),
                     m => Assert.Equal(model with {Count = random, Working = false}, m));
         }
