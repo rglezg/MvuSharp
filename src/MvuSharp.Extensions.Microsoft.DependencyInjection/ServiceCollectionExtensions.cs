@@ -10,7 +10,6 @@ namespace MvuSharp.Extensions.Microsoft.DependencyInjection
         public static IServiceCollection AddMvuSharp(this IServiceCollection services, IEnumerable<Assembly> assembliesToScan)
         {
             services.AddScoped<ServiceFactory>(p => p.GetService);
-            services.AddScoped<IMediator, Mediator>();
             services.AddRequestHandlers(assembliesToScan);
             return services;
         } 

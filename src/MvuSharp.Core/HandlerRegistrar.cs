@@ -1,18 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MvuSharp.Internal;
 
 namespace MvuSharp
 {
     public class HandlerRegistrar
     {
         private readonly Dictionary<Type, object> _handlers = new();
+        private readonly Dictionary<string, Type> _genericHandlers = new();
 
-        public object this[Type requestType] => _handlers[requestType];
+        public object this[Type requestType]
+        {
+            get
+            {
+                if (_handlers.TryGetValue(requestType, out var handler)
+                || TryCreateGenericHandler(requestType, out handler)) return handler;
+                throw new KeyNotFoundException($"Handler for request of type {requestType.FullName} not found.");
+            }
+        }
+
+        private bool TryCreateGenericHandler(Type requestType, out object handler)
+        {
+            if (!requestType.IsGenericType)
+            {
+                handler = null;
+                return false;
+            }
+
+            var handlerType = _genericHandlers[requestType.GetGenericTypeDefinition().ToString()]
+                .MakeGenericType(requestType.GenericTypeArguments);
+            var interfaceType = handlerType
+                .GetHandlerInterfaces()
+                .Single(i => i.GenericTypeArguments[0] == requestType);
+            handler = typeof(RequestHandlerImplementation<,,>)
+                .MakeGenericType(interfaceType.GenericTypeArguments)
+                .GetConstructor(new[] {interfaceType})
+                ?.Invoke(new [] {Activator.CreateInstance(handlerType)});
+            _handlers[requestType] = handler;
+            return true;
+        }
+
+        public HandlerRegistrar Add(Type handlerType)
+        {
+            var interfaces = handlerType
+                .GetHandlerInterfaces()
+                .ToList();
+            if (interfaces.Count == 0)
+                throw new ArgumentException($"{handlerType.FullName} is not a valid handler type.");
+            if (handlerType.IsGenericType)
+            {
+                foreach (var interfaceType in interfaces)
+                {
+                    _genericHandlers[interfaceType.GenericTypeArguments[0].ToString()] =
+                        handlerType.GetGenericTypeDefinition();
+                }
+            }
+            else
+            {
+                var handlerInstance = Activator.CreateInstance(handlerType);
+                foreach (var @interface in interfaces)
+                {
+                    _handlers[@interface.GenericTypeArguments[0]] = handlerInstance;
+                }
+            }
+
+            return this;
+        }
 
         public HandlerRegistrar Add<TRequest, TResponse, TService>(
-            RequestHandler<TRequest, TResponse, TService> handler)
+            Func<TRequest, TService, CancellationToken, Task<TResponse>> handler)
             where TRequest : IRequest<TResponse>
             where TService : class
         {
@@ -20,62 +79,14 @@ namespace MvuSharp
             return this;
         }
 
-        public HandlerRegistrar Add<TRequest, TService>(
-            Func<TRequest, TService, CancellationToken, Task> handler)
-            where TRequest : IRequest
-            where TService : class
+        public IMediator BuildMediator(ServiceFactory serviceFactory = null)
         {
-            return Add<TRequest, Unit, TService>(async (request, service, token) =>
-            {
-                await handler(request, service, token);
-                return Unit.Value;
-            });
-        }
+            serviceFactory ??= type =>
+                type == typeof(HandlerRegistrar)
+                    ? this
+                    : throw new ArgumentException($"$Unexpected service type: {type.FullName}");
 
-        public HandlerRegistrar Add<TRequest, TResponse, TService>(
-            Func<TRequest, TService, TResponse> handler)
-            where TRequest : IRequest<TResponse>
-            where TService : class
-        {
-            return Add((TRequest request, TService service, CancellationToken _) =>
-                Task.FromResult(handler(request, service)));
-        }
-
-        public HandlerRegistrar Add<TRequest, TService>(
-            Action<TRequest, TService> handler)
-            where TRequest : IRequest
-            where TService : class
-        {
-            return Add((TRequest request, TService service, CancellationToken _) =>
-            {
-                handler(request, service);
-                return Unit.Task;
-            });
-        }
-
-        public HandlerRegistrar Add<TRequest, TResponse>(
-            Func<TRequest, Task<TResponse>> handler)
-            where TRequest : IRequest<TResponse>
-        {
-            return Add<TRequest, TResponse, object>((request, _, _) => handler(request));
-        }
-
-        public HandlerRegistrar Add<TRequest, TResponse>(
-            Func<TRequest, TResponse> handler)
-            where TRequest : IRequest<TResponse>
-        {
-            return Add<TRequest, TResponse, object>((request, _, _) => Task.FromResult(handler(request)));
-        }
-
-        public HandlerRegistrar Add<TRequest>(
-            Action<TRequest> handler)
-            where TRequest : IRequest
-        {
-            return Add<TRequest, Unit>(request =>
-            {
-                handler(request);
-                return Unit.Task;
-            });
+            return new Mediator(serviceFactory);
         }
     }
 }
