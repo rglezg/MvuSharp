@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace MvuSharp
+namespace MvuSharp.Internal
 {
-    public class Mediator : IMediator
+    internal class Mediator : IMediator
     {
         private readonly ServiceFactory _factory;
         private readonly HandlerRegistrar _handlers;
-
-        private static readonly ConcurrentDictionary<Type, dynamic> Handlers = new();
 
         public Mediator(ServiceFactory serviceFactory)
         {
@@ -21,12 +17,8 @@ namespace MvuSharp
         public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request,
             CancellationToken cancellationToken)
         {
-            var requestType = request.GetType();
-            var definition = Handlers.GetOrAdd(
-                requestType,
-                (_, requestTypeArg) => _handlers[requestTypeArg],
-                requestType);
-            return await ((RequestHandlerWrapper<TResponse>) definition).RunAsync(request, _factory, cancellationToken);
+            return await ((RequestHandlerWrapper<TResponse>) _handlers[request.GetType()])
+                .RunAsync(request, _factory, cancellationToken);
         }
 
         public async Task SendAsync(IRequest request, CancellationToken cancellationToken)
