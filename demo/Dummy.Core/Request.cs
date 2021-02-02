@@ -6,11 +6,11 @@ namespace Dummy.Core
 {
     public static class Request
     {
-        public record AddUser(User UserToAdd) : IRequest;
-        public record DeleteUser(User UserToRemove) : IRequest;
-        public record FindUser(int Id) : IRequest<User>;
+        public record Add<TEntity>(TEntity Entity) : IRequest where TEntity : class;
+        public record Delete<TEntity>(TEntity Entity) : IRequest where TEntity : class;
+        public record Find<TEntity>(int Id) : IRequest<TEntity> where TEntity : class;
 
-        public record GetAllUsers : IRequest<IEnumerable<User>>;
+        public record GetAll<TEntity> : IRequest<IEnumerable<TEntity>>;
         public record SaveChanges : IRequest<bool>;
     }
 }

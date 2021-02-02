@@ -30,7 +30,7 @@ namespace Dummy.Core
             return (initModel,
                 async (mediator, dispatch, token) =>
                 {
-                    var list = (await mediator.SendAsync(new Request.GetAllUsers(), token)).ToRecordList();
+                    var list = (await mediator.SendAsync(new Request.GetAll<User>(), token)).ToRecordList();
                     if (list.Count != 0)
                     {
                         dispatch(new Msg.Set(initModel with {Users = list}));
@@ -47,7 +47,7 @@ namespace Dummy.Core
                     return (model,
                         async (mediator, dispatch, token) =>
                         {
-                            await mediator.SendAsync(new Request.AddUser(addMsg.UserToAdd), token);
+                            await mediator.SendAsync(new Request.Add<User>(addMsg.UserToAdd), token);
                             if (await mediator.SendAsync(new Request.SaveChanges(), token))
                             {
                                 dispatch(new Msg.Set(model with {
@@ -58,7 +58,7 @@ namespace Dummy.Core
                         });
                 case Msg.Delete id:
                     var user = list.Find(u => u.Id == id.Id);
-                    var request = new Request.DeleteUser(user);
+                    var request = new Request.Delete<User>(user);
                     return (model,
                         async (mediator, dispatch, token) =>
                         {

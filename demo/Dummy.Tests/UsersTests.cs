@@ -31,7 +31,8 @@ namespace Dummy.Tests
             var model = DefaultModel with {Adding = true};
             User added = null;
             new HandlerRegistrar()
-                .Add<Request.AddUser>(request => added = request.UserToAdd)
+                .Add(Handler.Create<Request.Add<User>>(_ => { }))
+                .Add(Handler.Create<Request.SaveChanges, bool>(_ => true))
                 .BuildMediator()
                 .TestMvuFunc(Update(model, new Msg.Add(user)),
                     m => Assert.Equal(
@@ -48,7 +49,8 @@ namespace Dummy.Tests
             var model = DefaultModel;
             User deleted = null;
             new HandlerRegistrar()
-                .Add<Request.DeleteUser>(request => deleted = request.UserToRemove)
+                .Add(Handler.Create<Request.Add<User>>(_ => { }))
+                .Add(Handler.Create<Request.SaveChanges, bool>(_ => true))
                 .BuildMediator()
                 .TestMvuFunc(Update(model, new Msg.Delete(id)),
                     m => Assert.Equal(model, m),
