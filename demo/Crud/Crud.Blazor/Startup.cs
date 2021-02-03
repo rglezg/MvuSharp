@@ -10,13 +10,13 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Dummy.Blazor.Data;
-using Dummy.Core;
-using Dummy.Core.Models;
+using Crud.Blazor.Data;
+using Crud.Core;
+using Crud.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using MvuSharp;
 
-namespace Dummy.Blazor
+namespace Crud.Blazor
 {
     public class Startup
     {

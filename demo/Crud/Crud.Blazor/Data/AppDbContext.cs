@@ -1,7 +1,7 @@
-﻿using Dummy.Core.Models;
+﻿using Crud.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Dummy.Blazor.Data
+namespace Crud.Blazor.Data
 {
     public class AppDbContext : DbContext
     {

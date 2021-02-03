@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Dummy.Core;
+using Crud.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MvuSharp;
 
-namespace Dummy.Blazor.Data
+namespace Crud.Blazor.Data
 {
     public static class EntityHandlers
     {

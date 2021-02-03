@@ -23,13 +23,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CounterApp.Blazor", "demo\C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CounterApp.Tests", "demo\Counter\CounterApp.Tests\CounterApp.Tests.csproj", "{B89A59D0-E5B6-4E05-9A13-F7D40A0C65B6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dummy", "Dummy", "{232EDD5B-F5E1-40DB-A7DB-9C1D23380059}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Crud", "Crud", "{232EDD5B-F5E1-40DB-A7DB-9C1D23380059}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dummy.Blazor", "demo\Dummy.Blazor\Dummy.Blazor.csproj", "{801CB943-74EA-45C8-B2F1-F0D685D11CCA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crud.Blazor", "demo\Crud\Crud.Blazor\Crud.Blazor.csproj", "{801CB943-74EA-45C8-B2F1-F0D685D11CCA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dummy.Core", "demo\Dummy.Core\Dummy.Core.csproj", "{109AB799-1B3E-4F72-902F-AD89C6D2B92A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crud.Core", "demo\Crud\Crud.Core\Crud.Core.csproj", "{109AB799-1B3E-4F72-902F-AD89C6D2B92A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dummy.Tests", "demo\Dummy.Tests\Dummy.Tests.csproj", "{0610F0C8-5D5F-4AB0-8282-2206FD7EEA96}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crud.Tests", "demo\Crud\Crud.Tests\Crud.Tests.csproj", "{0610F0C8-5D5F-4AB0-8282-2206FD7EEA96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

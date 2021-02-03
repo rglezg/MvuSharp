@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\MvuSharp.Core\MvuSharp.Core.csproj" />
+      <ProjectReference Include="..\..\..\src\MvuSharp.Core\MvuSharp.Core.csproj" />
     </ItemGroup>
 
 </Project>

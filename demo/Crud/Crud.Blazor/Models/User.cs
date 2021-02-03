@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Dummy.Blazor.Models
+namespace Crud.Blazor.Models
 {
     public class User
     {
