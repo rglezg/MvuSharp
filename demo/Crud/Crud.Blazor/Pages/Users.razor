@@ -1,0 +1,80 @@
+﻿@page "/users"
+@using static Crud.Core.Users
+@using User = Crud.Blazor.Models.User
+@inherits MvuSharp.Blazor.MvuPage<Component, Model, Msg>
+
+@if (Model.Adding)
+{
+    <div>
+        <h3>Create a new user</h3>
+        <EditForm Model="@_user"
+                  OnValidSubmit="@(() => Dispatch( new Msg.Add(new Core.Models.User( _user.Id, _user.Name, _user.Email, _user.Age))))">
+            <DataAnnotationsValidator/>
+            <ValidationSummary/>
+            <p>
+                <label>
+                    Name:
+                    <InputText @bind-Value="_user.Name"/>
+                </label>
+            </p>
+            <p>
+                <label>
+                    Email Address:
+                    <InputText @bind-Value="_user.Email"/>
+                </label>
+            </p>
+            <p>
+                <label>
+                    Age:
+                    <InputNumber @bind-Value="_user.Age"/>
+                </label>
+            </p>
+            <p>
+                <button class="btn btn-outline-success" type="submit">Submit</button>
+            </p>
+        </EditForm>
+    </div>
+}
+else
+{
+    <button class="btn btn-primary"
+            @onclick="@(async () => await Dispatch(new Msg.ShowAddView()))">
+        New User
+    </button>
+}
+<div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Email Address</th>
+            <th>Age</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var (id, name, email, age) in Model.Users.Collection)
+        {
+            <tr>
+                <td>@id</td>
+                <td>@name</td>
+                <td>@email</td>
+                <td>@age</td>
+                <td>
+                    <button
+                        class="btn btn-danger"
+                        @onclick="@(async () => await Dispatch(new Msg.Delete(id)))">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+@code{
+
+    private readonly User _user = new User();
+
+}
