@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Linq;
-using Dummy.Core.Models;
+using Crud.Core.Models;
 using MvuSharp;
 using MvuSharp.Collections;
 
-namespace Dummy.Core
+namespace Crud.Core
 {
     public static class Users
     {
         public record Model (RecordList<User> Users, bool Adding);
 
-        public record Msg
+        public abstract record Msg
         {
             private Msg()
             {

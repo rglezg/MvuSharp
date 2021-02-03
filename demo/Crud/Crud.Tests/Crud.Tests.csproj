@@ -20,8 +20,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\MvuSharp.Testing\MvuSharp.Testing.csproj" />
-      <ProjectReference Include="..\Dummy.Core\Dummy.Core.csproj" />
+      <ProjectReference Include="..\..\..\src\MvuSharp.Testing\MvuSharp.Testing.csproj" />
+      <ProjectReference Include="..\Crud.Core\Crud.Core.csproj" />
     </ItemGroup>
 
 </Project>

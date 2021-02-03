@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Dummy.Core.Models;
+using Crud.Core.Models;
 using MvuSharp;
 
-namespace Dummy.Core
+namespace Crud.Core
 {
     public static class Request
     {

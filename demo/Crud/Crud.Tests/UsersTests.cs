@@ -1,14 +1,14 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
-using Dummy.Core;
-using Dummy.Core.Models;
+using Crud.Core;
+using Crud.Core.Models;
 using MvuSharp;
 using MvuSharp.Collections;
 using MvuSharp.Testing;
 using Xunit;
-using static Dummy.Core.Users;
+using static Crud.Core.Users;
 
-namespace Dummy.Tests
+namespace Crud.Tests
 {
     public class UsersTests
     {
