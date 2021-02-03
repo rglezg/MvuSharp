@@ -31,7 +31,7 @@ namespace Crud.Tests
             var model = DefaultModel with {Adding = true};
             User added = null;
             new HandlerRegistrar()
-                .Add(Handler.Create<Request.Add<User>>(_ => { }))
+                .Add(Handler.Create<Request.Add<User>>(request => { added = request.Entity;}))
                 .Add(Handler.Create<Request.SaveChanges, bool>(_ => true))
                 .BuildMediator()
                 .TestMvuFunc(Update(model, new Msg.Add(user)),
@@ -49,7 +49,7 @@ namespace Crud.Tests
             var model = DefaultModel;
             User deleted = null;
             new HandlerRegistrar()
-                .Add(Handler.Create<Request.Add<User>>(_ => { }))
+                .Add(Handler.Create<Request.Delete<User>>(request => { deleted = request.Entity;}))
                 .Add(Handler.Create<Request.SaveChanges, bool>(_ => true))
                 .BuildMediator()
                 .TestMvuFunc(Update(model, new Msg.Delete(id)),
@@ -58,7 +58,7 @@ namespace Crud.Tests
                         new Msg.Set(model with {
                             Users = DefaultModel.Users.Collection.Where(u => u.Id != id).ToRecordList()}),
                         msg.Single()));
-            Assert.Equal(id, deleted.Id);
+            Assert.Equal(id, deleted?.Id);
         }
     }
 }
