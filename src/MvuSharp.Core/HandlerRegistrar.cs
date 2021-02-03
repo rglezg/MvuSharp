@@ -17,7 +17,7 @@ namespace MvuSharp
             get
             {
                 if (_handlers.TryGetValue(requestType, out var handler)
-                || TryCreateGenericHandler(requestType, out handler)) return handler;
+                    || TryCreateGenericHandler(requestType, out handler)) return handler;
                 throw new KeyNotFoundException($"Handler for request of type {requestType.FullName} not found.");
             }
         }
@@ -30,16 +30,9 @@ namespace MvuSharp
                 return false;
             }
 
-            var handlerType = _genericHandlers[requestType.GetGenericTypeDefinition().ToString()]
-                .MakeGenericType(requestType.GenericTypeArguments);
-            var interfaceType = handlerType
-                .GetHandlerInterfaces()
-                .Single(i => i.GenericTypeArguments[0] == requestType);
-            handler = typeof(RequestHandlerImplementation<,,>)
-                .MakeGenericType(interfaceType.GenericTypeArguments)
-                .GetConstructor(new[] {interfaceType})
-                ?.Invoke(new [] {Activator.CreateInstance(handlerType)});
-            _handlers[requestType] = handler;
+            handler = _handlers[requestType] =
+                ReflectionUtils.CreateGenericHandlerInstance(
+                    _genericHandlers[requestType.GetGenericTypeDefinition().GetGenericTypeDefinition()], requestType);
             return true;
         }
 
