@@ -10,7 +10,7 @@ namespace MvuSharp
     public class HandlerRegistrar
     {
         private readonly Dictionary<Type, object> _handlers = new();
-        private readonly Dictionary<string, Type> _genericHandlers = new();
+        private readonly Dictionary<Type, Type> _genericHandlers = new();
 
         public object this[Type requestType]
         {
@@ -47,7 +47,7 @@ namespace MvuSharp
             {
                 foreach (var interfaceType in interfaces)
                 {
-                    _genericHandlers[interfaceType.GenericTypeArguments[0].ToString()] =
+                    _genericHandlers[interfaceType.GenericTypeArguments[0].GetGenericTypeDefinition()] =
                         handlerType.GetGenericTypeDefinition();
                 }
             }
