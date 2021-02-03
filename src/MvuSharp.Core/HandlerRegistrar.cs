@@ -10,14 +10,14 @@ namespace MvuSharp
     public class HandlerRegistrar
     {
         private readonly Dictionary<Type, object> _handlers = new();
-        private readonly Dictionary<string, Type> _genericHandlers = new();
+        private readonly Dictionary<Type, Type> _genericHandlers = new();
 
         public object this[Type requestType]
         {
             get
             {
                 if (_handlers.TryGetValue(requestType, out var handler)
-                || TryCreateGenericHandler(requestType, out handler)) return handler;
+                    || TryCreateGenericHandler(requestType, out handler)) return handler;
                 throw new KeyNotFoundException($"Handler for request of type {requestType.FullName} not found.");
             }
         }
@@ -30,16 +30,9 @@ namespace MvuSharp
                 return false;
             }
 
-            var handlerType = _genericHandlers[requestType.GetGenericTypeDefinition().ToString()]
-                .MakeGenericType(requestType.GenericTypeArguments);
-            var interfaceType = handlerType
-                .GetHandlerInterfaces()
-                .Single(i => i.GenericTypeArguments[0] == requestType);
-            handler = typeof(RequestHandlerImplementation<,,>)
-                .MakeGenericType(interfaceType.GenericTypeArguments)
-                .GetConstructor(new[] {interfaceType})
-                ?.Invoke(new [] {Activator.CreateInstance(handlerType)});
-            _handlers[requestType] = handler;
+            handler = _handlers[requestType] =
+                ReflectionUtils.CreateGenericHandlerInstance(
+                    _genericHandlers[requestType.GetGenericTypeDefinition().GetGenericTypeDefinition()], requestType);
             return true;
         }
 
@@ -54,7 +47,7 @@ namespace MvuSharp
             {
                 foreach (var interfaceType in interfaces)
                 {
-                    _genericHandlers[interfaceType.GenericTypeArguments[0].ToString()] =
+                    _genericHandlers[interfaceType.GenericTypeArguments[0].GetGenericTypeDefinition()] =
                         handlerType.GetGenericTypeDefinition();
                 }
             }
