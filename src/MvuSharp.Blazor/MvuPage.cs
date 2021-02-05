@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Primitives;
 
 namespace MvuSharp.Blazor
 {
@@ -59,5 +62,19 @@ namespace MvuSharp.Blazor
         where TModel : class
     {
         public override Unit GetInitArgs() => Unit.Value;
+    }
+
+    public record InitArgs<TArg>(TArg RouteParam, IReadOnlyDictionary<string, StringValues> QueryParams);
+    public class MvuParamsPage<TComponent, TModel, TMsg, TArg> : MvuPage<TComponent, TModel, TMsg, InitArgs<TArg>>
+        where TComponent : MvuComponent<TModel, TMsg, InitArgs<TArg>>, new() 
+        where TModel : class
+    {
+        [Inject] public NavigationManager NavigationManager { get; set; }
+        public override InitArgs<TArg> GetInitArgs()
+        {
+            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            return new (GetRouteParameter(), QueryHelpers.ParseQuery(uri.Query));
+        }
+        public virtual TArg GetRouteParameter() => default;
     }
 }
