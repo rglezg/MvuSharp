@@ -32,10 +32,10 @@ namespace CustomGreeting.Core
                         ["name"] = parameters.Name
                     };
                     return (model with {Name = parameters.Name},
-                        async (mediator, handler, token) =>
+                        async (mediator, _) =>
                         {
                             await mediator.SendAsync(
-                                new NavigationRequest.NavigateTo(parameters.Path, dict), token);
+                                new NavigationRequest.NavigateTo(parameters.Path, dict));
                         });
                 default:
                     throw new InvalidOperationException(msg.GetType().FullName);
