@@ -1,0 +1,17 @@
+﻿@page "/question"
+@using static Core.Question
+@inherits MvuSharp.Blazor.MvuPage<Component, Model, Msg>
+
+<div class="text-center">
+    <h3>What's your name?</h3>
+    <input @bind="Name"/>
+</div>
+<div class="text-center">
+    <button class="btn btn-primary" @onclick="@(() => Dispatch(new Msg.GoToGreeting("greeting", Name)))">Click Me</button>
+</div>
+
+@code{
+
+    private string Name { get; set; }
+
+}
