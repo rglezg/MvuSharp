@@ -15,16 +15,15 @@ namespace MvuSharp.Blazor
         public static HandlerRegistrar AddNavigationHandler(this HandlerRegistrar registrar)
         {
             return registrar
-                .Add(typeof(NavigateTo));
-        }
-        
-        private class NavigateTo : SyncVoidRequestHandler<NavigationRequest.NavigateTo, NavigationManager>
-        {
-            protected override void Handle(NavigationRequest.NavigateTo request, NavigationManager service)
-            {
-                var (path, dictionary) = request;
-                service.NavigateTo(QueryHelpers.AddQueryString(path, dictionary.ToImmutableDictionary()));
-            }
+                .Add(Handler.Create<NavigationRequest.NavigateTo, NavigationManager>(
+                    (request, service) =>
+                    {
+                        var (path, queryParameters) = request;
+                        var queryString = queryParameters.Count > 0
+                            ? queryParameters.ToImmutableDictionary()
+                            : ImmutableDictionary<string, string>.Empty;
+                        service.NavigateTo(QueryHelpers.AddQueryString(path, queryString));
+                    }));
         }
     }
 }
