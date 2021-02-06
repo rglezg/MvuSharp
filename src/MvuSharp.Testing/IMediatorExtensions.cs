@@ -26,7 +26,7 @@ namespace MvuSharp.Testing
             Action<IEnumerable<TMsg>> assertMsg)
         {
             var msgList = new LinkedList<TMsg>();
-            command(mediator, msg => msgList.AddLast(msg), default).Wait();
+            command(mediator, msg => msgList.AddLast(msg)).Wait();
             assertMsg(msgList);
         }
     }

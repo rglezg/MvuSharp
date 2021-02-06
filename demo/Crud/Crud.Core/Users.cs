@@ -28,9 +28,9 @@ namespace Crud.Core
         {
             var initModel = new Model(RecordList<User>.Empty, false);
             return (initModel,
-                async (mediator, dispatch, token) =>
+                async (mediator, dispatch) =>
                 {
-                    var list = (await mediator.SendAsync(new Request.GetAll<User>(), token)).ToRecordList();
+                    var list = (await mediator.SendAsync(new Request.GetAll<User>())).ToRecordList();
                     if (list.Count != 0)
                     {
                         dispatch(new Msg.Set(initModel with {Users = list}));
@@ -45,10 +45,10 @@ namespace Crud.Core
             {
                 case Msg.Add addMsg:
                     return (model,
-                        async (mediator, dispatch, token) =>
+                        async (mediator, dispatch) =>
                         {
-                            await mediator.SendAsync(new Request.Add<User>(addMsg.UserToAdd), token);
-                            if (await mediator.SendAsync(new Request.SaveChanges(), token))
+                            await mediator.SendAsync(new Request.Add<User>(addMsg.UserToAdd));
+                            if (await mediator.SendAsync(new Request.SaveChanges()))
                             {
                                 dispatch(new Msg.Set(model with {
                                     Users = list.Add(addMsg.UserToAdd),
@@ -60,10 +60,10 @@ namespace Crud.Core
                     var user = list.Find(u => u.Id == id.Id);
                     var request = new Request.Delete<User>(user);
                     return (model,
-                        async (mediator, dispatch, token) =>
+                        async (mediator, dispatch) =>
                         {
-                            await mediator.SendAsync(request, token);
-                            if (await mediator.SendAsync(new Request.SaveChanges(), token))
+                            await mediator.SendAsync(request);
+                            if (await mediator.SendAsync(new Request.SaveChanges()))
                             {
                                 dispatch(new Msg.Set(model with {Users = list.Remove(user)}));
                             }

@@ -26,10 +26,10 @@ namespace MvuSharp
             _viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
         }
 
-        private IMediator CreateMediator()
+        private IMediator CreateMediator(CancellationToken cancellationToken)
         {
             var scope = _serviceProvider.CreateScope();
-            return new Mediator(scope.ServiceProvider.GetService);
+            return new Mediator(scope.ServiceProvider.GetService, cancellationToken);
         }
 
         public async Task InitAsync()
@@ -47,9 +47,9 @@ namespace MvuSharp
                 return;
             }
 
-            var mediator = CreateMediator();
+            var mediator = CreateMediator(CancellationToken.None);
             var msgQueue = new Queue<TMsg>();
-            await cmd(mediator, msgQueue.Enqueue, default);
+            await cmd(mediator, msgQueue.Enqueue);
             await MsgLoopAsync(msgQueue, default, mediator);
         }
 
@@ -86,10 +86,10 @@ namespace MvuSharp
                 await _viewEngine.RenderViewAsync(model);
 
                 if (cmd == null) continue;
-                mediator ??= CreateMediator();
+                mediator ??= CreateMediator(cancellationToken);
                 try
                 {
-                    await cmd(mediator, dispatchHandler, cancellationToken);
+                    await cmd(mediator, dispatchHandler);
                 }
                 catch (OperationCanceledException)
                 {

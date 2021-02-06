@@ -79,7 +79,7 @@ namespace MvuSharp
                     ? this
                     : throw new ArgumentException($"$Unexpected service type: {type.FullName}");
 
-            return new Mediator(serviceFactory);
+            return new Mediator(serviceFactory, CancellationToken.None);
         }
     }
 }
