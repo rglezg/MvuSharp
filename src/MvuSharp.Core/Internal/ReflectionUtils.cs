@@ -13,9 +13,8 @@ namespace MvuSharp.Internal
                     @interface.IsGenericType
                     && @interface.GetGenericTypeDefinition() == typeof(IRequestHandler<,,>));
 
-        public static object CreateGenericHandlerInstance(Type handlerGenericTypeDefinition, Type requestType)
+        public static object CreateHandlerInstance(Type handlerType, Type requestType)
         {
-            var handlerType = handlerGenericTypeDefinition.MakeGenericType(requestType.GenericTypeArguments);
             return Activator.CreateInstance(
                 typeof(RequestHandlerImplementation<,,>)
                     .MakeGenericType(
