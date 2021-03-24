@@ -52,7 +52,8 @@ namespace UnitTests
         {
             var expectedInstanceType = typeof(RequestHandlerImplementation<Samples.GenericRequest<int>, Unit, object>);
             var actualInstanceType = ReflectionUtils.CreateHandlerInstance(
-                typeof(Samples.GenericHandler<>), typeof(Samples.GenericRequest<int>)).GetType();
+                typeof(Samples.GenericHandler<>).GetGenericTypeDefinition().MakeGenericType(typeof(int)), 
+                typeof(Samples.GenericRequest<int>).GetGenericTypeDefinition()).GetType();
             Assert.Equal(expectedInstanceType, actualInstanceType);
         }
     }
