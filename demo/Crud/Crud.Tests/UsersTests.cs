@@ -3,7 +3,6 @@ using System.Linq;
 using Crud.Core;
 using Crud.Core.Models;
 using MvuSharp;
-using MvuSharp.Collections;
 using MvuSharp.Testing;
 using Xunit;
 using static Crud.Core.Users;
@@ -27,7 +26,7 @@ namespace Crud.Tests
         public void Add()
         {
             var user = new User(4,"Tester", "tester@email.com", 26);
-            RecordList<User> list = DefaultModel.Users.Collection.Add(user);
+            var list = DefaultModel.Users.Add(user);
             var model = DefaultModel with {Adding = true};
             User added = null;
             new HandlerRegistrar()
@@ -56,7 +55,7 @@ namespace Crud.Tests
                     m => Assert.Equal(model, m),
                     msg => Assert.Equal(
                         new Msg.Set(model with {
-                            Users = DefaultModel.Users.Collection.Where(u => u.Id != id).ToRecordList()}),
+                            Users = DefaultModel.Users.Where(u => u.Id != id).ToImmutableList()}),
                         msg.Single()));
             Assert.Equal(id, deleted?.Id);
         }
