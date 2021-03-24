@@ -20,7 +20,7 @@ namespace MvuSharp.Internal
                     .MakeGenericType(
                         handlerType
                             .GetHandlerInterfaces()
-                            .Single(i => i.GenericTypeArguments[0] == requestType)
+                            .Single(i => i.GenericTypeArguments[0].GUID == requestType.GUID)
                             .GenericTypeArguments),
                 Activator.CreateInstance(handlerType));
         }
