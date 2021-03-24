@@ -51,8 +51,9 @@ namespace UnitTests
         public void CreateGenericInstance()
         {
             var expectedInstanceType = typeof(RequestHandlerImplementation<Samples.GenericRequest<int>, Unit, object>);
-            var actualInstanceType = ReflectionUtils.CreateGenericHandlerInstance(
-                typeof(Samples.GenericHandler<>), typeof(Samples.GenericRequest<int>)).GetType();
+            var actualInstanceType = ReflectionUtils.CreateHandlerInstance(
+                typeof(Samples.GenericHandler<>).GetGenericTypeDefinition().MakeGenericType(typeof(int)), 
+                typeof(Samples.GenericRequest<int>).GetGenericTypeDefinition()).GetType();
             Assert.Equal(expectedInstanceType, actualInstanceType);
         }
     }

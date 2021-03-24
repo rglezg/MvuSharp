@@ -1,14 +1,18 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Linq;
 using Crud.Core.Models;
 using MvuSharp;
-using MvuSharp.Collections;
 
 namespace Crud.Core
 {
     public static class Users
     {
-        public record Model (RecordList<User> Users, bool Adding);
+        public record Model (IImmutableList<User> Users, bool Adding)
+        {
+            public virtual bool Equals(Model other) => Equ.EquCompare<Model>.Equals(this, other);
+            public override int GetHashCode() => Equ.EquCompare<Model>.GetHashCode(this);
+        }
 
         public abstract record Msg
         {
@@ -26,11 +30,11 @@ namespace Crud.Core
 
         public static (Model, CommandHandler<Msg>) Init()
         {
-            var initModel = new Model(RecordList<User>.Empty, false);
+            var initModel = new Model(ImmutableList<User>.Empty, false);
             return (initModel,
                 async (mediator, dispatch) =>
                 {
-                    var list = (await mediator.SendAsync(new Request.GetAll<User>())).ToRecordList();
+                    var list = (await mediator.SendAsync(new Request.GetAll<User>())).ToImmutableList();
                     if (list.Count != 0)
                     {
                         dispatch(new Msg.Set(initModel with {Users = list}));
@@ -40,7 +44,7 @@ namespace Crud.Core
 
         public static (Model, CommandHandler<Msg>) Update(Model model, Msg msg)
         {
-            var list = model.Users.Collection;
+            var list = model.Users;
             switch (msg)
             {
                 case Msg.Add addMsg:
@@ -56,8 +60,8 @@ namespace Crud.Core
                                 }));
                             }
                         });
-                case Msg.Delete id:
-                    var user = list.Find(u => u.Id == id.Id);
+                case Msg.Delete deleteMsg:
+                    var user = list.First(u => u.Id == deleteMsg.Id);
                     var request = new Request.Delete<User>(user);
                     return (model,
                         async (mediator, dispatch) =>
