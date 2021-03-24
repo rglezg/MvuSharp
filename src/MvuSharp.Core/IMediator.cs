@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MvuSharp
@@ -7,5 +8,6 @@ namespace MvuSharp
     {
         Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request);
         Task SendAsync(IRequest request);
+        void NavigateTo(string route, IReadOnlyDictionary<string, string> parameters);
     }
 }

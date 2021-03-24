@@ -72,14 +72,14 @@ namespace MvuSharp
             return this;
         }
 
-        public IMediator BuildMediator(ServiceFactory serviceFactory = null)
+        public IMediator BuildMediator(ServiceFactory serviceFactory = null, NavigationHandler navigationHandler = null)
         {
             serviceFactory ??= type =>
                 type == typeof(HandlerRegistrar)
                     ? this
                     : throw new ArgumentException($"$Unexpected service type: {type.FullName}");
 
-            return new Mediator(serviceFactory, CancellationToken.None);
+            return new Mediator(serviceFactory, navigationHandler,CancellationToken.None);
         }
     }
 }

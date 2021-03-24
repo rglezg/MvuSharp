@@ -1,6 +1,5 @@
 ﻿@page "/greeting"
-<h3>Greeting</h3>
+@using static CustomGreeting.Core.Greeting
+@inherits MvuSharp.Blazor.MvuParamsPage<Component, Model, MvuSharp.Unit, string>
 
-@code {
-    
-}
+<h3>Hello @(Model.Name)!</h3>

@@ -29,7 +29,7 @@ namespace MvuSharp
         private IMediator CreateMediator(CancellationToken cancellationToken)
         {
             var scope = _serviceProvider.CreateScope();
-            return new Mediator(scope.ServiceProvider.GetService, cancellationToken);
+            return new Mediator(scope.ServiceProvider.GetService, _viewEngine.NavigateTo, cancellationToken);
         }
 
         public async Task InitAsync()

@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\MvuSharp.Blazor\MvuSharp.Blazor.csproj" />
       <ProjectReference Include="..\..\src\MvuSharp.Core\MvuSharp.Core.csproj" />
     </ItemGroup>
 
