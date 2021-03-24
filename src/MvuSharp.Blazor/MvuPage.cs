@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -19,7 +20,11 @@ namespace MvuSharp.Blazor
         
         [Inject]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public IServiceProvider ServiceProvider { get; set; }
+        public IServiceProvider ServiceProvider { get; init; }
+        
+        [Inject]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public NavigationManager NavigationManager { get; init; }
 
         /// <summary>
         /// Puts a message in the message queue and starts the MVU loop.
@@ -31,7 +36,15 @@ namespace MvuSharp.Blazor
         {
             await _mvuProgram.DispatchAsync(msg, cancellationToken);
         }
-        
+
+        public void NavigateTo(string route, IReadOnlyDictionary<string, string> parameters)
+        {
+            var queryString = parameters.Count > 0
+                ? parameters.ToImmutableDictionary()
+                : ImmutableDictionary<string, string>.Empty;
+            NavigationManager.NavigateTo(QueryHelpers.AddQueryString(route, queryString));
+        }
+
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public async Task RenderViewAsync(TModel model)
         {
@@ -69,11 +82,10 @@ namespace MvuSharp.Blazor
         where TComponent : MvuComponent<TModel, TMsg, InitArgs<TArg>>, new() 
         where TModel : class
     {
-        [Inject] public NavigationManager NavigationManager { get; set; }
         public override InitArgs<TArg> GetInitArgs()
         {
             var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-            return new (GetRouteParameter(), QueryHelpers.ParseQuery(uri.Query));
+            return new InitArgs<TArg>(GetRouteParameter(), QueryHelpers.ParseQuery(uri.Query));
         }
         public virtual TArg GetRouteParameter() => default;
     }

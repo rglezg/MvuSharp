@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using MvuSharp;
 
 namespace CustomGreeting.Core
@@ -32,10 +33,10 @@ namespace CustomGreeting.Core
                         ["name"] = parameters.Name
                     };
                     return (model with {Name = parameters.Name},
-                        async (mediator, _) =>
+                        (mediator, _) =>
                         {
-                            await mediator.SendAsync(
-                                new NavigationRequest.NavigateTo(parameters.Path, dict));
+                            mediator.NavigateTo(parameters.Path, dict);
+                            return Task.CompletedTask;
                         });
                 default:
                     throw new InvalidOperationException(msg.GetType().FullName);
