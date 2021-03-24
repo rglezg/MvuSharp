@@ -32,7 +32,6 @@ namespace CustomGreeting.Blazor
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
             var handlers = new HandlerRegistrar();
-            handlers.AddNavigationHandler();
             services.AddSingleton(handlers);
         }
 

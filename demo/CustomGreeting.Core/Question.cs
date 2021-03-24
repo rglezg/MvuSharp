@@ -32,7 +32,7 @@ namespace CustomGreeting.Core
                     {
                         ["name"] = parameters.Name
                     };
-                    return (model with {Name = parameters.Name},
+                    return (model,
                         (mediator, _) =>
                         {
                             mediator.NavigateTo(parameters.Path, dict);
