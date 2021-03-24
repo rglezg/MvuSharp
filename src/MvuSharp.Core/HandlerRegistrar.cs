@@ -31,8 +31,9 @@ namespace MvuSharp
             }
 
             handler = _handlers[requestType] =
-                ReflectionUtils.CreateGenericHandlerInstance(
-                    _genericHandlers[requestType.GetGenericTypeDefinition().GetGenericTypeDefinition()], requestType);
+                ReflectionUtils.CreateHandlerInstance(
+                    _genericHandlers[requestType.GetGenericTypeDefinition()]
+                        .MakeGenericType(requestType.GenericTypeArguments), requestType);
             return true;
         }
 
@@ -53,10 +54,9 @@ namespace MvuSharp
             }
             else
             {
-                var handlerInstance = Activator.CreateInstance(handlerType);
-                foreach (var @interface in interfaces)
+                foreach (var requestType in interfaces.Select(@interface => @interface.GenericTypeArguments[0]))
                 {
-                    _handlers[@interface.GenericTypeArguments[0]] = handlerInstance;
+                    _handlers[requestType] = ReflectionUtils.CreateHandlerInstance(handlerType, requestType);
                 }
             }
 
